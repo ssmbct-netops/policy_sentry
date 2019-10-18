@@ -4,11 +4,20 @@ from pathlib import Path
 import os
 from policy_sentry.shared.file import read_this_file, create_directory_if_it_doesnt_exist, list_files_in_directory
 import shutil
+from distutils.dir_util import copy_tree
 
 HOME = str(Path.home())
 CONFIG_DIRECTORY = '/.policy_sentry/'
 DATABASE_FILE_NAME = 'aws.sqlite3'
-AUDIT_DIRECTORY_FOLDER = 'audit/'
+# These are subfolders under ~/.policy_sentry
+AUDIT_DIRECTORY_SUBFOLDER = '/audit'
+DATA_DIRECTORY_SUBFOLDER = '/data'
+HTML_DATA_DIRECTORY_SUBFOLDER = '/data/docs'
+
+database_path = HOME + CONFIG_DIRECTORY + DATABASE_FILE_NAME
+audit_directory_path = HOME + CONFIG_DIRECTORY + AUDIT_DIRECTORY_SUBFOLDER
+html_directory_path = HOME + CONFIG_DIRECTORY + HTML_DATA_DIRECTORY_SUBFOLDER
+data_directory_path = HOME + CONFIG_DIRECTORY + DATA_DIRECTORY_SUBFOLDER
 
 
 def create_policy_sentry_config_directory():
@@ -17,8 +26,6 @@ def create_policy_sentry_config_directory():
     :return: the path of the database file
     """
     print("Creating the database...")
-
-    database_path = HOME + CONFIG_DIRECTORY + DATABASE_FILE_NAME
     print("We will store the new database here: " + database_path)
     # If the database file already exists
     if os.path.exists(database_path):
@@ -35,7 +42,6 @@ def create_audit_directory():
     """
     Creates directory for analyze_iam_policy audit files and places audit files there.
     """
-    audit_directory_path = HOME + CONFIG_DIRECTORY + AUDIT_DIRECTORY_FOLDER
     create_directory_if_it_doesnt_exist(audit_directory_path)
     destination = audit_directory_path
 
@@ -48,3 +54,20 @@ def create_audit_directory():
             shutil.copy(source + '/' + file, destination)
             print("copying " + file + " to " + destination)
 
+
+def create_html_docs_directory():
+    """
+    Copies the HTML files from the pip package over to its own folder in the CONFIG_DIRECTORY.
+    :return:
+    """
+    create_directory_if_it_doesnt_exist(html_directory_path)
+    existing_html_docs_folder = os.path.abspath(os.path.dirname(__file__)) + HTML_DATA_DIRECTORY_SUBFOLDER
+    copy_tree(existing_html_docs_folder, html_directory_path)
+
+
+# def update_html_docs_directory():
+#     """
+#     Updates the HTML docs from remote location to either (1) local directory
+#     (i.e., this repository, or (2) the config directory
+#     :return:
+#     """

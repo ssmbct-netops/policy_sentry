@@ -2,7 +2,7 @@
 
 import os
 import click
-from policy_sentry.shared.config import create_policy_sentry_config_directory, create_audit_directory
+from policy_sentry.shared.config import create_policy_sentry_config_directory, create_audit_directory, create_html_docs_directory
 from pathlib import Path
 from policy_sentry.shared.database import connect_db, create_database
 
@@ -199,6 +199,8 @@ def initialize():
     database_path = create_policy_sentry_config_directory()
     # Create audit directory to host list of permissions for analyze_iam_policy
     create_audit_directory()
+    # Copy over the html docs
+    create_html_docs_directory()
     # Connect to the database at that path with sqlalchemy
     db_session = connect_db(database_path)
     # Fill in the database with data on the AWS services
